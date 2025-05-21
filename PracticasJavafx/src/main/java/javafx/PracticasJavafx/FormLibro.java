@@ -24,50 +24,82 @@ import javafx.stage.Stage;
 
 public class FormLibro extends GridPane{
 	
+	private Connection con =UtilsBD.ConectarBD();
+	
+	private TextField txfTitulo=new TextField();
+	
+	private ComboBox cBoxGenero=new ComboBox();
+	
+	private TextField txfAutor=new TextField();
+	
+	private Slider sldanioPubli =new Slider();
+	
+	private CheckBox chbDispo = new CheckBox();
+	
+	private Button seleccionarBtn = new Button("Seleccionar Portada");
+	
 	private TextField rutaPortadaField;
 	
+	private Button btnGuardar =new Button("Guardar Libro");
 	
-	
+	private Button btnActualizar =new Button("Actualizar");
 	
 	public FormLibro() {
 		
 		//Añadimos todo los componentes del formulario
 		
 		Label lblTitulo =new Label("Titulo:");
-		TextField txfTitulo=new TextField();
+		
 		txfTitulo.setPromptText("titulo...");
 		
 		Label lblGenero =new Label("Genero:");
-		ComboBox cBoxGenero=new ComboBox();
+		
 		cBoxGenero.getItems().addAll("Novela","Ciencia Ficción","Historia","Infantil");
 		
 		Label lblAutor =new Label("Autor:");
-		TextField txfAutor=new TextField();
+		
 		txfAutor.setPromptText("autor...");
 		
 		Label lblanioPubli = new Label("Año publicacion:");
-		Slider sldanioPubli =new Slider();
+		
 		sldanioPubli.setShowTickLabels(true);
-		sldanioPubli.setMin(1800);
-		sldanioPubli.setMax(2024);
+		sldanioPubli.setMin(1900);
+		sldanioPubli.setMax(2023);
+		sldanioPubli.setMajorTickUnit(1);
+		sldanioPubli.setSnapToTicks(true);
+		sldanioPubli.setBlockIncrement(1);
 		
 		sldanioPubli.setOnMouseReleased(e ->{
 			lblanioPubli.setText("Año publicacion: " +(int) sldanioPubli.getValue());
 		});
 		
 		Label lblDisponibilidad = new Label("Disponible:");
-		CheckBox chbDispo = new CheckBox();
+		
 		
 		Label lblPortada = new Label("Formulario de Portada");
-        Button seleccionarBtn = new Button("Seleccionar Portada");
+        
         rutaPortadaField = new TextField();
         rutaPortadaField.setPromptText("Ruta de la portada...");
         
-        Button btnGuardar =new Button("Guardar Libro");
         
         //Metemos la accion al boton para selecionar la portada
         seleccionarBtn.setOnAction(e-> {
         	seleccionarPortada();
+        });
+        
+        btnActualizar.setDisable(true);
+        
+        btnActualizar.setOnAction(e->{
+        	
+        	char dispoSelect;
+        	
+        	if(chbDispo.isSelected()) {
+        		dispoSelect='S';
+        	}else {
+        		dispoSelect='N';
+        	}
+        	
+        	actualizarLibro(txfTitulo.getText(),(String) cBoxGenero.getValue(), txfAutor.getText(), (int) sldanioPubli.getValue(), dispoSelect, rutaPortadaField.getText());
         });
         
         btnGuardar.setOnAction(e-> {
@@ -109,6 +141,7 @@ public class FormLibro extends GridPane{
         this.add(seleccionarBtn, 2, 5);
         this.add(rutaPortadaField, 1, 5);
         this.add(btnGuardar, 0, 6);
+        this.add(btnActualizar, 1, 6);
         
         this.setVgap(10);
         this.setHgap(10);
@@ -136,22 +169,93 @@ public class FormLibro extends GridPane{
 	
 	public void insertarLibro(String titulo,String genero,String autor,int anioPublicacion,char disponibilidad,String portada) {
 		
+		
+		
 		libroDO libro =new libroDO(1, titulo, genero, autor, anioPublicacion, disponibilidad, portada);
 		
-		Connection con =UtilsBD.ConectarBD();
+		
 		
 		libroDAO.insertar(libro, con);
 		
 		
 	}
+	
+    public void actualizarLibro(String titulo,String genero,String autor,int anioPublicacion,char disponibilidad,String portada) {
+		
+    	Modificar mod =new Modificar();
+    	
+		libroDO libro =new libroDO(Integer.parseInt(mod.getIdLibro().getText()), titulo, genero, autor, anioPublicacion, disponibilidad, portada);
+		
+		
+		
+		libroDAO.actualizar(libro, con);
+		
+		
+	}
+	
 	private static void mostrarAlerta() {
 		
 		//añadimos una alerta nueva parra cuando salte un error
 		Alert alertaError =new Alert(AlertType.ERROR);
 		alertaError.setTitle("Error de aplicacion");
-		alertaError.setHeaderText("no se puede ejecutar el formulario");
-		alertaError.setContentText("no has rellenado uno de los campos");
+		alertaError.setHeaderText("No se puede ejecutar el formulario");
+		alertaError.setContentText("No has rellenado los campos");
 		alertaError.showAndWait();
-	}	
+	}
+	
+	public TextField getTxfTitulo() {
+		return txfTitulo;
+	}
+	public void setTxfTitulo(TextField txfTitulo) {
+		this.txfTitulo = txfTitulo;
+	}
+	public TextField getTxfAutor() {
+		return txfAutor;
+	}
+	public void setTxfAutor(TextField txfAutor) {
+		this.txfAutor = txfAutor;
+	}
+	public Slider getSldanioPubli() {
+		return sldanioPubli;
+	}
+	public void setSldanioPubli(Slider sldanioPubli) {
+		this.sldanioPubli = sldanioPubli;
+	}
+	public CheckBox getChbDispo() {
+		return chbDispo;
+	}
+	public void setChbDispo(CheckBox chbDispo) {
+		this.chbDispo = chbDispo;
+	}
+	public Button getSeleccionarBtn() {
+		return seleccionarBtn;
+	}
+	public void setSeleccionarBtn(Button seleccionarBtn) {
+		this.seleccionarBtn = seleccionarBtn;
+	}
+	public TextField getRutaPortadaField() {
+		return rutaPortadaField;
+	}
+	public void setRutaPortadaField(TextField rutaPortadaField) {
+		this.rutaPortadaField = rutaPortadaField;
+	}
+	public ComboBox getcBoxGenero() {
+		return cBoxGenero;
+	}
+	public void setcBoxGenero(ComboBox cBoxGenero) {
+		this.cBoxGenero = cBoxGenero;
+	}
+	public Button getBtnGuardar() {
+		return btnGuardar;
+	}
+	public void setBtnGuardar(Button btnGuardar) {
+		this.btnGuardar = btnGuardar;
+	}
+	public Button getBtnActualizar() {
+		return btnActualizar;
+	}
+	public void setBtnActualizar(Button btnActualizar) {
+		this.btnActualizar = btnActualizar;
+	}
 
 }

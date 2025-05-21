@@ -1,6 +1,7 @@
 package Practica.sql;
 
 import java.sql.Connection;
+
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,6 +12,7 @@ import java.util.Calendar;
 
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+
 
 
 
@@ -157,6 +159,32 @@ public class libroDAO {
 	    return libro;
 	}
 	
+    public static int eliminar(int id, Connection con) {
+        String sql = "DELETE FROM libro WHERE idLibro = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+        	pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0 ? 0 : -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+    
+    public static int actualizar(libroDO libro, Connection con) {
+        String sql = "UPDATE libro SET titulo = ?, genero = ?, autor = ?, disponibilidad = ?, portada = ?, anioPublicacion = ? WHERE idLibro = ?";
+        try (PreparedStatement pstmt = con.prepareStatement(sql)) {
+            pstmt.setString(1, libro.getTitulo());
+            pstmt.setString(2, libro.getGenero());
+            pstmt.setString(3, libro.getAutor());
+            pstmt.setString(4, Character.toString(libro.getDisponible()));
+            pstmt.setString(5, libro.getPortada());
+            pstmt.setInt(6, libro.getAnioPublicacion());
+            return pstmt.executeUpdate() > 0 ? 0 : -1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
 	
 	
 }
